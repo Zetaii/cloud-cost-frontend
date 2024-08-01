@@ -47,27 +47,50 @@ ChartJS.register(
   Legend
 )
 
+interface CloudCost {
+  month: string
+  cost: number
+}
+
+interface Resource {
+  name: string
+  type: string
+  cost: number
+}
+
 const CustomInput = ({ value, onClick }: any) => (
   <Input value={value} onClick={onClick} readOnly cursor="pointer" size="md" />
 )
 
 const Dashboard = () => {
-  const [startDate, setStartDate] = useState(
+  const [startDate, setStartDate] = useState<Date>(
     new Date(new Date().setMonth(new Date().getMonth() - 1))
   )
-  const [endDate, setEndDate] = useState(new Date())
-  const [cloudCosts, setCloudCosts] = useState([])
+  const [endDate, setEndDate] = useState<Date>(new Date())
+  const [cloudCosts, setCloudCosts] = useState<CloudCost[]>([])
   const [serviceUsage, setServiceUsage] = useState({ labels: [], data: [] })
   const [dailyCosts, setDailyCosts] = useState({ labels: [], data: [] })
-  const [resources, setResources] = useState([])
+  const [resources, setResources] = useState<Resource[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   const [instanceCount, setInstanceCount] = useState(1)
   const [hoursPerDay, setHoursPerDay] = useState(24)
   const [daysPerMonth, setDaysPerMonth] = useState(30)
   const [costPerHour, setCostPerHour] = useState(0.1)
   const [estimatedCost, setEstimatedCost] = useState(0)
+
+  const handleStartDateChange = (date: Date | null) => {
+    if (date) {
+      setStartDate(date)
+    }
+  }
+
+  const handleEndDateChange = (date: Date | null) => {
+    if (date) {
+      setEndDate(date)
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,7 +113,11 @@ const Dashboard = () => {
         setDailyCosts(daily)
         setResources(resourcesData)
       } catch (e) {
-        setError(e.message)
+        if (e instanceof Error) {
+          setError(e.message)
+        } else {
+          setError("An unknown error occurred")
+        }
       } finally {
         setIsLoading(false)
       }
@@ -209,25 +236,21 @@ const Dashboard = () => {
                 <Text mb={2}>Start Date</Text>
                 <DatePicker
                   selected={startDate}
-                  onChange={(date) => setStartDate(date)}
+                  onChange={handleStartDateChange}
                   selectsStart
                   startDate={startDate}
                   endDate={endDate}
-                  maxDate={endDate}
-                  customInput={<CustomInput />}
                 />
               </Box>
               <Box mb={{ base: 4, md: 0 }} mr={{ md: 4 }}>
                 <Text mb={2}>End Date</Text>
                 <DatePicker
                   selected={endDate}
-                  onChange={(date) => setEndDate(date)}
+                  onChange={handleEndDateChange}
                   selectsEnd
                   startDate={startDate}
                   endDate={endDate}
                   minDate={startDate}
-                  maxDate={new Date()}
-                  customInput={<CustomInput />}
                 />
               </Box>
               <Button
