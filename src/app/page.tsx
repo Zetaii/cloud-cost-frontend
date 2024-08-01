@@ -80,6 +80,9 @@ const Dashboard = () => {
   const [costPerHour, setCostPerHour] = useState(0.1)
   const [estimatedCost, setEstimatedCost] = useState(0)
 
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:8000"
+
   const handleStartDateChange = (date: Date | null) => {
     if (date) {
       setStartDate(date)
@@ -97,10 +100,10 @@ const Dashboard = () => {
       try {
         const [costsRes, serviceRes, dailyRes, resourcesRes] =
           await Promise.all([
-            fetch("http://127.0.0.1:8000/cloud-costs"),
-            fetch("http://127.0.0.1:8000/service-usage"),
-            fetch("http://127.0.0.1:8000/daily-costs"),
-            fetch("http://127.0.0.1:8000/resources"),
+            fetch(`${API_BASE_URL}/cloud-costs`),
+            fetch(`${API_BASE_URL}/service-usage`),
+            fetch(`${API_BASE_URL}/daily-costs`),
+            fetch(`${API_BASE_URL}/resources`),
           ])
 
         const costs = await costsRes.json()
@@ -126,7 +129,8 @@ const Dashboard = () => {
     fetchData()
 
     // WebSocket connection
-    const ws = new WebSocket("ws://127.0.0.1:8000/ws")
+    const WS_URL = process.env.REACT_APP_WS_URL || "ws://localhost:8000/ws"
+    const ws = new WebSocket(WS_URL)
 
     ws.onopen = () => {
       console.log("WebSocket Connected")
