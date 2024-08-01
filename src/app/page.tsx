@@ -83,6 +83,8 @@ const Dashboard = () => {
   const API_BASE_URL =
     process.env.REACT_APP_API_BASE_URL || "http://localhost:8000"
 
+  const WS_URL = process.env.REACT_APP_WS_URL || "ws://127.0.0.1:8000/ws"
+
   const handleStartDateChange = (date: Date | null) => {
     if (date) {
       setStartDate(date)
@@ -129,7 +131,7 @@ const Dashboard = () => {
     fetchData()
 
     // WebSocket connection
-    const WS_URL = process.env.REACT_APP_WS_URL || "ws://localhost:8000/ws"
+
     const ws = new WebSocket(WS_URL)
 
     ws.onopen = () => {
@@ -161,7 +163,7 @@ const Dashboard = () => {
 
   const estimateCost = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/estimate-cost", {
+      const response = await fetch(`${API_BASE_URL}/estimate-cost`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -176,21 +178,30 @@ const Dashboard = () => {
       const data = await response.json()
       setEstimatedCost(data.estimatedMonthlyCost)
     } catch (e) {
-      console.error("Error estimating cost:", e)
+      console.error(
+        "Error estimating cost:",
+        e instanceof Error ? e.message : "An unknown error occurred"
+      )
     }
   }
 
   const filterDataByDateRange = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/filtered-costs?start_date=${
+        `${API_BASE_URL}/filtered-costs?start_date=${
           startDate.toISOString().split("T")[0]
         }&end_date=${endDate.toISOString().split("T")[0]}`
       )
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
       const filteredCosts = await response.json()
       setCloudCosts(filteredCosts)
     } catch (e) {
-      console.error("Error filtering data:", e)
+      console.error(
+        "Error filtering data:",
+        e instanceof Error ? e.message : "An unknown error occurred"
+      )
     }
   }
 
