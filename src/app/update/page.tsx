@@ -20,11 +20,24 @@ import {
 } from "@chakra-ui/react"
 import Layout from "../components/Layout"
 
+interface ServiceUsage {
+  labels: string[]
+  data: number[]
+}
+
+interface CloudCost {
+  month: string
+  cost: number
+}
+
 const UpdatePage = () => {
-  const [cloudCosts, setCloudCosts] = useState([])
-  const [serviceUsage, setServiceUsage] = useState({ labels: [], data: [] })
+  const [cloudCosts, setCloudCosts] = useState<CloudCost[]>([])
+  const [serviceUsage, setServiceUsage] = useState<ServiceUsage>({
+    labels: [],
+    data: [],
+  })
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   const toast = useToast()
 
@@ -45,13 +58,14 @@ const UpdatePage = () => {
           usageResponse.json(),
         ])
 
-        setCloudCosts(costsData)
         setServiceUsage(usageData)
       } catch (err) {
-        setError(err.message)
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred"
+        setError(errorMessage)
         toast({
           title: "Error fetching data",
-          description: err.message,
+          description: errorMessage,
           status: "error",
           duration: 3000,
           isClosable: true,
@@ -64,19 +78,34 @@ const UpdatePage = () => {
     fetchData()
   }, [toast])
 
-  const handleCloudCostChange = (index, field, value) => {
-    const newCosts = [...cloudCosts]
-    newCosts[index][field] = field === "cost" ? parseFloat(value) : value
-    setCloudCosts(newCosts)
+  const handleCloudCostChange = (
+    index: number,
+    field: keyof CloudCost,
+    value: string
+  ) => {
+    setCloudCosts((prevCosts) => {
+      const newCosts = [...prevCosts]
+      if (field === "cost") {
+        newCosts[index][field] = parseFloat(value)
+      } else {
+        newCosts[index][field] = value
+      }
+      return newCosts
+    })
   }
 
-  const handleServiceUsageChange = (index, value) => {
+  const handleServiceUsageChange = (index: number, value: string) => {
     const newData = [...serviceUsage.data]
     newData[index] = parseFloat(value)
     setServiceUsage({ ...serviceUsage, data: newData })
   }
 
-  const updateData = async (url, data, successMessage, errorMessage) => {
+  const updateData = async (
+    url: string,
+    data: any,
+    successMessage: string,
+    errorMessage: string
+  ) => {
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -96,7 +125,7 @@ const UpdatePage = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         status: "error",
         duration: 3000,
         isClosable: true,
