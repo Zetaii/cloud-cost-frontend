@@ -39,6 +39,9 @@ const UpdatePage = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000"
+
   const toast = useToast()
 
   useEffect(() => {
@@ -135,7 +138,7 @@ const UpdatePage = () => {
 
   const updateCloudCosts = () =>
     updateData(
-      "http://127.0.0.1:8000/update-cloud-costs",
+      `${API_BASE_URL}/update-cloud-costs`,
       cloudCosts,
       "Cloud costs updated successfully",
       "Failed to update cloud costs"
@@ -143,7 +146,7 @@ const UpdatePage = () => {
 
   const updateServiceUsage = () =>
     updateData(
-      "http://127.0.0.1:8000/update-service-usage",
+      `${API_BASE_URL}/update-service-usage`,
       serviceUsage,
       "Service usage updated successfully",
       "Failed to update service usage"
