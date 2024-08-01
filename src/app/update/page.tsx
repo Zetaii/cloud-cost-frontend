@@ -49,8 +49,8 @@ const UpdatePage = () => {
       setIsLoading(true)
       try {
         const [costsResponse, usageResponse] = await Promise.all([
-          fetch("http://127.0.0.1:8000/cloud-costs"),
-          fetch("http://127.0.0.1:8000/service-usage"),
+          fetch(`${API_BASE_URL}/cloud-costs`),
+          fetch(`${API_BASE_URL}/service-usage`),
         ])
 
         if (!costsResponse.ok) throw new Error("Failed to fetch cloud costs")
