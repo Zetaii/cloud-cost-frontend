@@ -81,9 +81,8 @@ const Dashboard = () => {
   const [estimatedCost, setEstimatedCost] = useState(0)
 
   const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL || "http://localhost:8000"
-
-  const WS_URL = process.env.REACT_APP_WS_URL || "ws://127.0.0.1:8000/ws"
+    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+  const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/ws"
 
   const handleStartDateChange = (date: Date | null) => {
     if (date) {
